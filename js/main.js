@@ -11,6 +11,19 @@
 const API_BASE = 'http://localhost:8000';
 let backendAvailable = false;
 
+// Supabase Configuration
+// TODO: Replace with your actual Supabase URL and Anon Key
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+// Initialize Supabase only if credentials are provided (not placeholders)
+let supabase = null;
+if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+let currentUser = null;
+
 // ---------------------------------------------------------------------------
 // Global State
 // ---------------------------------------------------------------------------
@@ -49,6 +62,11 @@ const els = {
     waveform: () => document.getElementById('voice-waveform'),
     backendDot: () => document.getElementById('backend-dot'),
     backendStatusText: () => document.getElementById('backend-status-text'),
+    // Auth Elements
+    btnLogin: () => document.getElementById('btn-login'),
+    btnLogout: () => document.getElementById('btn-logout'),
+    userProfile: () => document.getElementById('user-profile'),
+    userName: () => document.getElementById('user-name')
 };
 
 // ---------------------------------------------------------------------------
@@ -58,7 +76,58 @@ document.addEventListener('DOMContentLoaded', () => {
     checkBackendHealth();
     setupDifficultySelection();
     setupVoiceToggles();
+    setupAuth();
 });
+
+function setupAuth() {
+    if (!supabase) return; // Skip if Supabase is not configured
+
+    const btnLogin = els.btnLogin();
+    const btnLogout = els.btnLogout();
+
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async () => {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+            });
+            if (error) console.error("Error signing in:", error.message);
+        });
+    }
+
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) console.error("Error signing out:", error.message);
+        });
+    }
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+    });
+
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+    });
+}
+
+function updateAuthUI() {
+    const btnLogin = els.btnLogin();
+    const userProfile = els.userProfile();
+    const userName = els.userName();
+
+    if (currentUser) {
+        if (btnLogin) btnLogin.classList.add('hidden');
+        if (userProfile) userProfile.classList.remove('hidden');
+        if (userName) userName.textContent = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+    } else {
+        if (btnLogin) btnLogin.classList.remove('hidden');
+        if (userProfile) userProfile.classList.add('hidden');
+    }
+}
 
 function setupVoiceToggles() {
     const toggleVoice = () => {
@@ -119,6 +188,15 @@ function setupDifficultySelection() {
     });
 }
 
+async function getAuthHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (currentUser && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+    return headers;
+}
+
 // ---------------------------------------------------------------------------
 // Game Lifecycle
 // ---------------------------------------------------------------------------
@@ -142,9 +220,11 @@ async function startNewGame() {
     // Try to start a backend session
     if (backendAvailable) {
         try {
+            const headers = await getAuthHeaders();
+            
             const res = await fetch(`${API_BASE}/new_game`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({}),
             });
             const data = await res.json();
@@ -155,6 +235,7 @@ async function startNewGame() {
             sessionId = null;
         }
     }
+
 
     // Switch screens
     els.diffScreen().classList.remove('active');
@@ -272,9 +353,10 @@ async function handleMove(parsed) {
 
 async function handleMoveViaBackend(moveStr) {
     try {
+        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE}/move`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({ session_id: sessionId, move: moveStr }),
         });
 
@@ -364,7 +446,11 @@ async function handleCommand(parsed) {
     if (cmd === 'undo') {
         if (backendAvailable && sessionId) {
             try {
-                const res = await fetch(`${API_BASE}/undo?session_id=${sessionId}`, { method: 'POST' });
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${API_BASE}/undo?session_id=${sessionId}`, { 
+                    method: 'POST',
+                    headers: headers
+                });
                 const data = await res.json();
                 game.load(data.fen);
                 moveHistory = moveHistory.slice(0, -data.moves_undone);
@@ -408,7 +494,8 @@ async function handleQuery(parsed) {
     if (query === 'where') {
         if (backendAvailable && sessionId) {
             try {
-                const res = await fetch(`${API_BASE}/state?session_id=${sessionId}`);
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${API_BASE}/state?session_id=${sessionId}`, { headers });
                 const data = await res.json();
                 const whitePieces = data.piece_summary.white.join(', ');
                 voice.speak(`Your pieces: ${whitePieces}`);
@@ -419,7 +506,8 @@ async function handleQuery(parsed) {
     } else if (query === 'read_board') {
         if (backendAvailable && sessionId) {
             try {
-                const res = await fetch(`${API_BASE}/state?session_id=${sessionId}`);
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${API_BASE}/state?session_id=${sessionId}`, { headers });
                 const data = await res.json();
                 voice.speak(`White: ${data.piece_summary.white.join(', ')}. Black: ${data.piece_summary.black.join(', ')}.`);
                 return;
@@ -431,7 +519,8 @@ async function handleQuery(parsed) {
     } else if (query === 'hint') {
         if (backendAvailable && sessionId) {
             try {
-                const res = await fetch(`${API_BASE}/hint?session_id=${sessionId}`);
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${API_BASE}/hint?session_id=${sessionId}`, { headers });
                 const data = await res.json();
                 voice.speak(`I suggest ${data.description}. Confidence: ${Math.round(data.confidence * 100)}%.`);
                 showAIFeedback(`Hint: ${data.description}`, data.confidence);

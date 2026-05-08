@@ -86,6 +86,15 @@
         <!-- TopAppBar -->
         <header class="flex justify-end items-center px-6 py-4 w-full max-w-7xl mx-auto absolute top-0 right-0 z-50">
             <div class="flex items-center gap-4">
+                <div id="auth-container" class="flex items-center gap-2">
+                    <button id="btn-login" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-sm tracking-wide shadow-sm hover:bg-primary/90 transition-colors">Login with Google</button>
+                    <div id="user-profile" class="hidden flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant">
+                        <span id="user-name" class="font-body-md text-sm text-on-surface"></span>
+                        <button id="btn-logout" class="text-error hover:text-error/80 ml-2" aria-label="Logout">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                        </button>
+                    </div>
+                </div>
                 <button id="voice-toggle-diff" class="text-outline hover:bg-surface-container-high transition-colors p-2 rounded-full flex items-center justify-center" aria-label="Toggle AI Voice">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">volume_up</span>
                 </button>
@@ -309,6 +318,7 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/move-parser.js"></script>
     <script src="js/chess-engine.js"></script>
     <script src="js/voice.js"></script>
