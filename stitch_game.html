@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mental Chess - Train</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#1d1b20",
+                    "surface-container": "#f2ecf4",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "background": "#fdf7ff",
+                    "surface-container-high": "#ece6ee",
+                    "outline-variant": "#cbc4d2",
+                    "on-tertiary-fixed-variant": "#594400",
+                    "inverse-on-surface": "#f5eff7",
+                    "tertiary-fixed": "#ffdf93",
+                    "on-primary-fixed": "#22005d",
+                    "on-tertiary-container": "#503d00",
+                    "surface-bright": "#fdf7ff",
+                    "primary": "#6750A4",
+                    "secondary": "#63597c",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#4b4263",
+                    "primary-container": "#6750a4",
+                    "surface": "#fdf7ff",
+                    "primary-fixed-dim": "#cfbcff",
+                    "secondary-container": "#e1d4fd",
+                    "primary-fixed": "#e9ddff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#645a7d",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#ded8e0",
+                    "on-surface": "#1d1b20",
+                    "surface-tint": "#6750a4",
+                    "surface-container-low": "#f8f2fa",
+                    "on-primary-container": "#e0d2ff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e9ddff",
+                    "secondary-fixed-dim": "#cdc0e9",
+                    "on-tertiary-fixed": "#241a00",
+                    "tertiary-fixed-dim": "#e7c365",
+                    "on-secondary": "#ffffff",
+                    "on-surface-variant": "#494551",
+                    "outline": "#7a7582",
+                    "tertiary": "#B04B32",
+                    "on-primary-fixed-variant": "#4f378a",
+                    "inverse-primary": "#cfbcff",
+                    "inverse-surface": "#322f35",
+                    "tertiary-container": "#c9a74d",
+                    "surface-container-highest": "#e6e0e9",
+                    "on-secondary-fixed": "#1f1635",
+                    "surface-variant": "#e6e0e9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding": "24px",
+                    "unit": "8px",
+                    "touch-target-min": "56px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "h1": [
+                            "Inter"
+                    ],
+                    "label-caps": [
+                            "Inter"
+                    ],
+                    "h2": [
+                            "Inter"
+                    ],
+                    "mono-data": [
+                            "Space Mono"
+                    ]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        /* Tonal Stippling / Gond Dot Utilities */
+        .gond-border-bottom {
+            border-bottom: 2px dotted theme('colors.primary');
+        }
+        .gond-border {
+            border: 2px dotted theme('colors.primary');
+        }
+        .gond-stipple-shadow {
+            box-shadow: 0 4px 6px -1px rgba(103, 80, 164, 0.1), 0 2px 4px -1px rgba(103, 80, 164, 0.06);
+        }
+        
+        /* Subtle repeating dot background pattern for specific areas if needed */
+        .gond-pattern-bg {
+            background-image: radial-gradient(theme('colors.primary') 1px, transparent 1px);
+            background-size: 6px 6px;
+            opacity: 0.05;
+        }
+
+        /* Fluid scale on active targets */
+        .tap-target-active:active {
+            transform: scale(0.98);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container relative">
+<div class="absolute inset-0 gond-pattern-bg pointer-events-none z-0"></div>
+<!-- TopAppBar -->
+<header class="bg-background/80 backdrop-blur-md flex justify-between items-center px-container-padding py-unit w-full max-w-7xl mx-auto docked full-width top-0 z-10 sticky gond-border-bottom">
+<div class="flex items-center gap-4">
+<!-- Brand -->
+<div class="text-h2 font-display font-bold text-primary">
+                Mental Chess
+            </div>
+<!-- Status Indicators -->
+<div class="hidden md:flex items-center gap-4 ml-8">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-dashed border-outline-variant">
+<span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-wider">Listening...</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-on-primary">
+<span class="font-label-caps text-label-caps tracking-wider">Advanced</span>
+</div>
+</div>
+</div>
+<!-- Trailing Actions & Desktop Nav -->
+<div class="flex items-center gap-4">
+<button class="text-outline hover:bg-surface-container-high transition-colors p-2 rounded-full tap-target-active flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="hover:bg-surface-container-high transition-colors p-1 rounded-full tap-target-active overflow-hidden w-10 h-10 border border-dashed border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSHlkBZ3QQpCsNYhxgGqe90vmHLCZAo-wubVi-AOxseluEWWDT_0zF3HSHlDIY-cETcbkkoDYpUUdJWuOW6Su8bOylAD53Ud8WeHGcBbDFmzP6jgyGUAwT-KByWDT96tFxdx80lTXjJOMhkklkHJm2NyX2hGpncA_IninOg271m-iqsdMU-m7cvGrEBt79oKQzCV3k453CjCd9OL8-rQg9rC1O9vQ_32myU-FjdffOP-Y-nK9vrAYgLyCQxXf7bEAKq6-tHZSd1yqB"/>
+</button>
+</div>
+</header>
+<!-- Main Game Area -->
+<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-6 flex flex-col md:flex-row gap-8 overflow-hidden pb-32 md:pb-6 relative z-10">
+<!-- Left Column: Commands & Visualizer -->
+<aside class="w-full md:w-1/4 flex flex-col gap-6 order-2 md:order-1">
+<!-- Quick Commands (Bento style) -->
+<section class="bg-surface rounded-xl gond-border p-5 flex flex-col gap-4 relative overflow-hidden group">
+<h3 class="font-h2 text-h2 text-primary border-b border-dotted border-primary pb-2 font-bold">Commands</h3>
+<div class="space-y-3 relative z-10">
+<div class="group/cmd cursor-pointer">
+<div class="flex items-center justify-between text-on-surface font-body-md group-hover/cmd:text-primary transition-colors font-semibold">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-tertiary">mic</span> Make Moves</span>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</div>
+<div class="pl-7 pt-1 font-mono-data text-mono-data text-outline-variant text-sm">e.g. "Knight to f3"</div>
+</div>
+<div class="group/cmd cursor-pointer">
+<div class="flex items-center justify-between text-on-surface font-body-md group-hover/cmd:text-primary transition-colors font-semibold">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-tertiary">psychology_alt</span> Ask Questions</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="group/cmd cursor-pointer">
+<div class="flex items-center justify-between text-on-surface font-body-md group-hover/cmd:text-primary transition-colors font-semibold">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-tertiary">tune</span> Game Control</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</aside>
+<!-- Center Column: Voice Hero -->
+<section class="w-full md:w-2/4 flex flex-col justify-center items-center py-12 order-1 md:order-2 relative">
+<!-- Voice Recognition Core -->
+<div class="text-center w-full max-w-lg relative z-10">
+<!-- Listening Indicator Wave -->
+<div class="flex justify-center items-end gap-1.5 h-12 mb-8">
+<div class="w-1.5 bg-[#10b981] rounded-full animate-[bounce_1s_infinite_100ms] h-4"></div>
+<div class="w-1.5 bg-[#10b981] rounded-full animate-[bounce_1s_infinite_200ms] h-8"></div>
+<div class="w-1.5 bg-[#10b981] rounded-full animate-[bounce_1s_infinite_300ms] h-12"></div>
+<div class="w-1.5 bg-[#10b981] rounded-full animate-[bounce_1s_infinite_400ms] h-6"></div>
+<div class="w-1.5 bg-[#10b981] rounded-full animate-[bounce_1s_infinite_500ms] h-3"></div>
+</div>
+<div class="relative inline-block mb-12">
+<h1 class="font-display text-[36px] font-bold text-primary tracking-tight leading-none mb-2">knight to f3</h1>
+<!-- Pulsing underline -->
+<div class="h-1 w-full bg-primary-container rounded-full overflow-hidden mt-4">
+<div class="h-full bg-tertiary w-1/2 animate-pulse rounded-full"></div>
+</div>
+</div>
+<!-- AI Response Card -->
+<div class="bg-surface rounded-xl p-6 gond-border text-left max-w-sm mx-auto shadow-sm">
+<p class="font-body-lg text-[18px] font-medium text-on-surface flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[24px] mt-0.5 shrink-0 animate-pulse">volume_up</span>
+<span>Claude: I played <span class="font-mono-data font-bold text-tertiary">bishop c4</span>, attacking f7</span>
+</p>
+</div>
+</div>
+<!-- Board Placeholder (Moved to Center per 3-col logic if preferred, or keeping as separate block) -->
+<section class="w-full max-w-md mt-12 bg-surface rounded-xl gond-border flex flex-col items-center justify-center p-8 relative overflow-hidden text-center tap-target-active shadow-sm">
+<span class="material-symbols-outlined text-[48px] text-tertiary mb-4 relative z-10" style="font-variation-settings: 'FILL' 0;">visibility_off</span>
+<p class="font-body-lg text-body-lg text-primary font-bold mb-2 relative z-10">Board hidden - mental chess mode</p>
+</section>
+<!-- Controls (Desktop) -->
+<div class="hidden md:flex flex-wrap justify-center gap-4 mt-16 w-full">
+<button class="bg-[#10b981] text-white rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active shadow-md hover:opacity-90 transition-opacity font-label-caps tracking-widest uppercase border-2 border-dashed border-white/50">
+<span class="material-symbols-outlined text-[20px]">play_arrow</span> Start
+</button>
+<button class="bg-[#ef4444] text-white rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active shadow-md hover:opacity-90 transition-opacity font-label-caps tracking-widest uppercase border-2 border-dashed border-white/50">
+<span class="material-symbols-outlined text-[20px]">stop</span> Stop
+</button>
+<button class="bg-surface text-primary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-colors font-label-caps tracking-widest uppercase gond-border">
+<span class="material-symbols-outlined text-[20px]">visibility</span> Show Board
+</button>
+<button class="bg-surface text-primary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-colors font-label-caps tracking-widest uppercase gond-border">
+<span class="material-symbols-outlined text-[20px]">lightbulb</span> Hint
+</button>
+<button class="bg-surface text-primary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-colors font-label-caps tracking-widest uppercase gond-border">
+<span class="material-symbols-outlined text-[20px]">undo</span> Undo
+</button>
+<button class="bg-surface text-tertiary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-colors font-label-caps tracking-widest uppercase border-2 border-dotted border-tertiary">
+    New Game
+</button>
+</div>
+</section>
+<!-- Right Column: Move History -->
+<aside class="w-full md:w-1/4 flex flex-col order-3 h-[400px] md:h-auto">
+<div class="bg-surface rounded-xl gond-border flex flex-col h-full overflow-hidden">
+<div class="p-4 border-b border-dotted border-primary flex justify-between items-center">
+<h3 class="font-h2 text-h2 text-primary font-bold">Move History</h3>
+<span class="material-symbols-outlined text-tertiary">history</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-2 font-mono-data text-mono-data">
+<!-- List Header -->
+<div class="flex text-primary font-bold border-b border-dashed border-primary/30 pb-2 mb-3">
+<div class="w-8 text-right pr-2">#</div>
+<div class="flex-1 pl-2">White</div>
+<div class="flex-1 pl-2">Black</div>
+</div>
+<!-- Moves -->
+<div class="flex items-center py-1 hover:bg-surface-container-low transition-colors rounded px-1">
+<div class="w-8 text-right pr-2 text-outline">1.</div>
+<div class="flex-1 pl-2 text-on-surface">e4</div>
+<div class="flex-1 pl-2 text-on-surface">e5</div>
+</div>
+<div class="flex items-center py-1 hover:bg-surface-container-low transition-colors rounded px-1">
+<div class="w-8 text-right pr-2 text-outline">2.</div>
+<div class="flex-1 pl-2 text-on-surface">Nf3</div>
+<div class="flex-1 pl-2 text-on-surface">Nc6</div>
+</div>
+<!-- Current Move Highlight -->
+<div class="flex items-center py-1.5 px-1 relative group mt-2 bg-primary/10 border border-dotted border-primary rounded">
+<div class="w-8 text-right pr-2 text-primary font-bold relative z-10">3.</div>
+<div class="flex-1 pl-2 text-primary font-bold relative z-10 flex items-center gap-1">
+                            Bc4 
+</div>
+<div class="flex-1 pl-2 text-primary/70 relative z-10">...</div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex flex-wrap justify-center gap-2 p-4 bg-surface-container-lowest rounded-t-xl gond-border-bottom border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<button class="bg-[#10b981] text-white rounded-full p-3 tap-target-active shadow-md">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<button class="bg-[#ef4444] text-white rounded-full p-3 tap-target-active shadow-md">
+<span class="material-symbols-outlined">stop</span>
+</button>
+<button class="bg-surface text-primary rounded-full p-3 tap-target-active gond-border">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-surface text-primary rounded-full p-3 tap-target-active gond-border">
+<span class="material-symbols-outlined">undo</span>
+</button>
+</nav>
+</body></html>

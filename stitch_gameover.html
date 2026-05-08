@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mental Chess - Game Over</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1d1b20",
+                        "surface-container": "#f2ecf4",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fdf7ff",
+                        "surface-container-high": "#ece6ee",
+                        "outline-variant": "#cbc4d2",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "inverse-on-surface": "#f5eff7",
+                        "tertiary-fixed": "#ffdf93",
+                        "on-primary-fixed": "#22005d",
+                        "on-tertiary-container": "#503d00",
+                        "surface-bright": "#fdf7ff",
+                        "primary": "#4f378a",
+                        "secondary": "#63597c",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4263",
+                        "primary-container": "#6750a4",
+                        "surface": "#fdf7ff",
+                        "primary-fixed-dim": "#cfbcff",
+                        "secondary-container": "#e1d4fd",
+                        "primary-fixed": "#e9ddff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#645a7d",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#ded8e0",
+                        "on-surface": "#1d1b20",
+                        "surface-tint": "#6750a4",
+                        "surface-container-low": "#f8f2fa",
+                        "on-primary-container": "#e0d2ff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e9ddff",
+                        "secondary-fixed-dim": "#cdc0e9",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#e7c365",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#494551",
+                        "outline": "#7a7582",
+                        "tertiary": "#765b00",
+                        "on-primary-fixed-variant": "#4f378a",
+                        "inverse-primary": "#cfbcff",
+                        "inverse-surface": "#322f35",
+                        "tertiary-container": "#c9a74d",
+                        "surface-container-highest": "#e6e0e9",
+                        "on-secondary-fixed": "#1f1635",
+                        "surface-variant": "#e6e0e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "unit": "8px",
+                        "touch-target-min": "56px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "display": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h1": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"],
+                        "mono-data": ["Space Mono"]
+                    },
+                    "fontSize": {
+                        "display": ["40px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "h1": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "h2": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "mono-data": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .stippled-border {
+            border: 1px dashed var(--tw-colors-outline-variant);
+            border-image: repeating-linear-gradient(45deg, transparent, transparent 2px, var(--tw-colors-outline-variant) 2px, var(--tw-colors-outline-variant) 4px) 1;
+        }
+        .gond-dot {
+            background-image: radial-gradient(circle, var(--tw-colors-primary) 20%, transparent 20%);
+            background-size: 4px 4px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md relative overflow-hidden flex items-center justify-center">
+<!-- Blurred Background Context -->
+<div class="absolute inset-0 z-0 opacity-50 blur-sm pointer-events-none" style="background-image: repeating-linear-gradient(0deg, var(--tw-colors-surface-container) 0px, var(--tw-colors-surface-container) 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, var(--tw-colors-surface-container) 0px, var(--tw-colors-surface-container) 1px, transparent 1px, transparent 40px);"></div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-40 bg-on-background/10 backdrop-blur-md flex items-center justify-center p-4">
+<!-- Game Over Modal Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-2xl relative z-50 w-full max-w-2xl overflow-hidden flex flex-col items-center p-8 border border-outline-variant/30">
+<!-- Gond Stippled Corner Accents -->
+<div class="absolute top-0 left-0 w-16 h-16 gond-dot opacity-20 pointer-events-none rounded-br-full"></div>
+<div class="absolute bottom-0 right-0 w-16 h-16 gond-dot opacity-20 pointer-events-none rounded-tl-full"></div>
+<!-- Header -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-tertiary-container/20 text-tertiary mb-4 relative">
+<span class="material-symbols-outlined text-display" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+</div>
+<h1 class="font-display text-display text-primary mb-2">CHECKMATE! White Wins</h1>
+<div class="flex items-center justify-center space-x-6 text-on-surface-variant font-mono-data text-mono-data mt-4">
+<span class="flex items-center"><span class="material-symbols-outlined mr-2">tag</span>Moves: 28</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="flex items-center"><span class="material-symbols-outlined mr-2">timer</span>Time: 12:34</span>
+</div>
+</div>
+<!-- Performance Card -->
+<div class="w-full bg-surface-container-low rounded-lg p-6 mb-8 stippled-border relative overflow-hidden">
+<div class="absolute inset-0 opacity-5 pointer-events-none gond-dot"></div>
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-6 text-center tracking-widest">Performance Summary</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+<div class="flex flex-col items-center text-center">
+<div class="text-h1 font-h1 text-primary mb-1">87%</div>
+<div class="text-body-md font-body-md text-on-surface-variant">Accuracy</div>
+</div>
+<div class="hidden md:block w-px bg-outline-variant/30 h-full mx-auto"></div>
+<div class="md:hidden h-px bg-outline-variant/30 w-full my-2"></div>
+<div class="flex flex-col items-center text-center">
+<div class="text-h1 font-h1 text-secondary mb-1">2</div>
+<div class="text-body-md font-body-md text-on-surface-variant">Illegal Moves</div>
+</div>
+<div class="hidden md:block w-px bg-outline-variant/30 h-full mx-auto"></div>
+<div class="md:hidden h-px bg-outline-variant/30 w-full my-2"></div>
+<div class="flex flex-col items-center text-center">
+<div class="text-h1 font-h1 text-error mb-1">1</div>
+<div class="text-body-md font-body-md text-on-surface-variant">Blunders</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-wrap justify-center gap-4 w-full">
+<button class="min-h-[56px] px-6 py-3 rounded-full bg-surface-container text-on-surface font-body-lg text-body-lg flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 duration-200 group">
+<span class="material-symbols-outlined mr-2 text-primary group-hover:scale-110 transition-transform">content_copy</span>
+                    Copy PGN
+                </button>
+<button class="min-h-[56px] px-8 py-3 rounded-full bg-primary text-on-primary font-body-lg text-body-lg flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-95 duration-200 group relative overflow-hidden shadow-lg">
+<div class="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-500 ease-out -skew-x-12 -translate-x-full"></div>
+<span class="material-symbols-outlined mr-2">play_arrow</span>
+                    New Game
+                </button>
+<button class="min-h-[56px] px-6 py-3 rounded-full bg-surface-container text-on-surface font-body-lg text-body-lg flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 duration-200 group">
+<span class="material-symbols-outlined mr-2 text-secondary group-hover:scale-110 transition-transform">query_stats</span>
+                    Analysis
+                </button>
+</div>
+<!-- Close Link -->
+<div class="mt-6">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center font-label-caps text-label-caps tracking-widest uppercase">
+<span class="material-symbols-outlined mr-1 text-[18px]">close</span>
+                    Close
+                </button>
+</div>
+</div>
+</div>
+</body></html>

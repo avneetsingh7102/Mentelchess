@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Mental Chess - Gond Training</title>
+    <meta name="description" content="Train your chess visualization skills with a voice-controlled mental chess trainer powered by neural networks.">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "on-background": "#1d1b20",
+              "surface-container": "#f2ecf4",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "background": "#fdf7ff",
+              "surface-container-high": "#ece6ee",
+              "outline-variant": "#cbc4d2",
+              "on-tertiary-fixed-variant": "#594400",
+              "inverse-on-surface": "#f5eff7",
+              "tertiary-fixed": "#ffdf93",
+              "on-primary-fixed": "#22005d",
+              "on-tertiary-container": "#503d00",
+              "surface-bright": "#fdf7ff",
+              "primary": "#6750A4",
+              "secondary": "#63597c",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#4b4263",
+              "primary-container": "#6750a4",
+              "surface": "#fdf7ff",
+              "primary-fixed-dim": "#cfbcff",
+              "secondary-container": "#e1d4fd",
+              "primary-fixed": "#e9ddff",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary-container": "#645a7d",
+              "on-primary": "#ffffff",
+              "surface-dim": "#ded8e0",
+              "on-surface": "#1d1b20",
+              "surface-tint": "#6750a4",
+              "surface-container-low": "#f8f2fa",
+              "on-primary-container": "#e0d2ff",
+              "error": "#ba1a1a",
+              "secondary-fixed": "#e9ddff",
+              "secondary-fixed-dim": "#cdc0e9",
+              "on-tertiary-fixed": "#241a00",
+              "tertiary-fixed-dim": "#e7c365",
+              "on-secondary": "#ffffff",
+              "on-surface-variant": "#494551",
+              "outline": "#7a7582",
+              "tertiary": "#B04B32",
+              "on-primary-fixed-variant": "#4f378a",
+              "inverse-primary": "#cfbcff",
+              "inverse-surface": "#322f35",
+              "tertiary-container": "#c9a74d",
+              "surface-container-highest": "#e6e0e9",
+              "on-secondary-fixed": "#1f1635",
+              "surface-variant": "#e6e0e9"
+            },
+            "fontFamily": {
+              "display": ["Inter"],
+              "body-md": ["Inter"],
+              "body-lg": ["Inter"],
+              "h1": ["Inter"],
+              "label-caps": ["Inter"],
+              "h2": ["Inter"],
+              "mono-data": ["Space Mono"]
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container relative z-0">
+    <div class="fixed inset-0 gond-pattern-bg pointer-events-none z-[-1]"></div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="difficulty-screen" class="screen active flex-1 w-full flex-col">
+        <!-- TopAppBar -->
+        <header class="flex justify-end items-center px-6 py-4 w-full max-w-7xl mx-auto absolute top-0 right-0 z-50">
+            <div class="flex items-center gap-4">
+                <button id="voice-toggle-diff" class="text-outline hover:bg-surface-container-high transition-colors p-2 rounded-full flex items-center justify-center" aria-label="Toggle AI Voice">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">volume_up</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow pt-[100px] pb-16 px-6 flex flex-col items-center justify-center max-w-5xl mx-auto w-full relative z-10 min-h-[90vh]">
+            
+            <div id="backend-status" class="mb-8 flex items-center gap-2 bg-surface-container-lowest/80 backdrop-blur-sm px-4 py-2 rounded-full border border-dotted border-outline-variant shadow-sm">
+                <div id="backend-dot" class="w-2.5 h-2.5 rounded-full bg-warning animate-pulse status-dot"></div>
+                <span id="backend-status-text" class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Checking neural engine...</span>
+            </div>
+
+            <!-- Brand Hero -->
+            <div class="flex flex-col items-center text-center mb-16">
+                <div class="w-24 h-24 mb-6 flex items-center justify-center text-primary text-6xl drop-shadow-md hover:scale-105 transition-transform duration-500">♚</div>
+                <h1 class="font-display text-[48px] text-primary mb-3 tracking-tight font-bold">Mental Chess</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md tracking-wide">Master blindfold chess through voice</p>
+            </div>
+
+            <!-- Difficulty Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+                <!-- Beginner Card -->
+                <button id="diff-beginner" data-level="beginner" class="difficulty-btn difficulty-card beginner gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#10b981] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+                    <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
+                        <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#10b981] border border-dotted border-[#10b981]/50 shadow-sm">
+                            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">visibility</span>
+                        </div>
+                        <h2 class="font-h2 text-h2 text-on-surface font-bold">Beginner</h2>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant z-10 pointer-events-none">Guided play with hints.</p>
+                </button>
+
+                <!-- Intermediate Card -->
+                <button id="diff-intermediate" data-level="intermediate" class="difficulty-btn difficulty-card intermediate gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#3b82f6] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+                    <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
+                        <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#3b82f6] border border-dotted border-[#3b82f6]/50 shadow-sm">
+                            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">explore</span>
+                        </div>
+                        <h2 class="font-h2 text-h2 text-on-surface font-bold">Intermediate</h2>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant z-10 pointer-events-none">Balanced challenge.</p>
+                </button>
+
+                <!-- Advanced Card -->
+                <button id="diff-advanced" data-level="advanced" class="difficulty-btn difficulty-card advanced gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#8b5cf6] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+                    <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
+                        <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#8b5cf6] border border-dotted border-[#8b5cf6]/50 shadow-sm">
+                            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">castle</span>
+                        </div>
+                        <h2 class="font-h2 text-h2 text-on-surface font-bold">Advanced</h2>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant z-10 pointer-events-none">Strong neural play.</p>
+                </button>
+
+                <!-- Master Card -->
+                <button id="diff-master" data-level="master" class="difficulty-btn difficulty-card master gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#dc2626] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+                    <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
+                        <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#dc2626] border border-dotted border-[#dc2626]/50 shadow-sm">
+                            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                        </div>
+                        <h2 class="font-h2 text-h2 text-on-surface font-bold">Master</h2>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant z-10 pointer-events-none">Full neural strength.</p>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen flex-1 w-full flex-col relative z-10">
+        <!-- TopAppBar -->
+        <header class="bg-background/90 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto sticky top-0 z-50 gond-border-bottom">
+            <div class="flex items-center gap-4">
+                <div class="text-h2 font-display font-bold text-primary flex items-center gap-2">
+                    <span class="text-2xl">♚</span> Mental Chess
+                </div>
+                <div class="hidden md:flex items-center gap-4 ml-8">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-dashed border-outline-variant">
+                        <span id="listening-status" class="w-2.5 h-2.5 rounded-full bg-[#10b981] status-dot animate-pulse"></span>
+                        <span id="status-text" class="font-label-caps text-label-caps text-on-surface-variant tracking-wider">Ready</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-on-primary shadow-sm">
+                        <span id="current-difficulty" class="font-label-caps text-label-caps tracking-wider uppercase">Level</span>
+                    </div>
+                    <div id="mode-badge" class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container">
+                        <span class="mode-icon">🧠</span> <span class="font-label-caps tracking-wider text-xs">Mental Mode</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="voice-toggle-game" class="text-outline hover:bg-surface-container-high transition-colors p-2 rounded-full tap-target-active flex items-center justify-center" aria-label="Toggle AI Voice">
+                    <span class="material-symbols-outlined">volume_up</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row gap-8 overflow-hidden pb-12">
+            
+            <!-- Left Column: Commands (Bento) -->
+            <aside class="w-full md:w-1/4 flex flex-col gap-6 order-2 md:order-1">
+                <section class="bg-surface rounded-xl gond-border p-6 flex flex-col gap-5 relative overflow-hidden group shadow-sm h-full max-h-[500px]">
+                    <h3 class="font-h2 text-h2 text-primary border-b border-dotted border-primary/50 pb-3 font-bold">Voice Commands</h3>
+                    <div class="space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                        <div class="group/cmd">
+                            <div class="flex items-center text-on-surface font-body-md font-semibold mb-1">
+                                <span class="material-symbols-outlined text-[18px] text-tertiary mr-2">mic</span> Make Moves
+                            </div>
+                            <div class="pl-7 font-mono-data text-outline-variant text-sm">"e4", "knight f3", "castle"</div>
+                        </div>
+                        <div class="group/cmd">
+                            <div class="flex items-center text-on-surface font-body-md font-semibold mb-1">
+                                <span class="material-symbols-outlined text-[18px] text-tertiary mr-2">psychology_alt</span> Inquire
+                            </div>
+                            <div class="pl-7 font-mono-data text-outline-variant text-sm">"Where is the black queen?"</div>
+                        </div>
+                        <div class="group/cmd">
+                            <div class="flex items-center text-on-surface font-body-md font-semibold mb-1">
+                                <span class="material-symbols-outlined text-[18px] text-tertiary mr-2">visibility</span> Visualization
+                            </div>
+                            <div class="pl-7 font-mono-data text-outline-variant text-sm">"Read the board", "Show board"</div>
+                        </div>
+                        <div class="group/cmd">
+                            <div class="flex items-center text-on-surface font-body-md font-semibold mb-1">
+                                <span class="material-symbols-outlined text-[18px] text-tertiary mr-2">history</span> Game State
+                            </div>
+                            <div class="pl-7 font-mono-data text-outline-variant text-sm">"Move history", "Hint", "Undo"</div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Center Column: Voice Hero -->
+            <section class="w-full md:w-2/4 flex flex-col justify-start items-center py-4 order-1 md:order-2 relative">
+                
+                <div class="text-center w-full max-w-lg relative z-10 flex flex-col items-center min-h-[220px] justify-center">
+                    <!-- Listening Indicator Wave -->
+                    <div id="voice-waveform" class="voice-waveform flex justify-center items-end gap-1.5 h-12 mb-8 opacity-30 transition-opacity duration-300">
+                        <div class="wave-bar w-1.5 bg-[#10b981] rounded-full h-4 transition-all"></div>
+                        <div class="wave-bar w-1.5 bg-[#10b981] rounded-full h-8 transition-all"></div>
+                        <div class="wave-bar w-1.5 bg-[#10b981] rounded-full h-12 transition-all"></div>
+                        <div class="wave-bar w-1.5 bg-[#10b981] rounded-full h-6 transition-all"></div>
+                        <div class="wave-bar w-1.5 bg-[#10b981] rounded-full h-3 transition-all"></div>
+                    </div>
+                    
+                    <div class="relative inline-block mb-10 w-full text-center">
+                        <h1 id="recognized-text" class="font-display text-[32px] md:text-[40px] font-bold text-primary tracking-tight leading-tight mb-3">Say your move...</h1>
+                        <div id="last-spoken" class="text-on-surface-variant font-body-md mt-2 h-6 italic"></div>
+                    </div>
+
+                    <!-- AI Response Card -->
+                    <div id="ai-feedback" class="bg-surface rounded-xl p-5 gond-border text-left w-full shadow-sm" style="display: none;">
+                        <p class="font-body-lg text-[18px] font-medium text-on-surface flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-[28px] shrink-0 animate-pulse">volume_up</span>
+                            <span class="flex-1 flex flex-col">
+                                <span id="ai-message" class="leading-snug text-primary"></span>
+                                <span id="ai-confidence" class="font-mono-data text-sm text-tertiary mt-2 font-bold tracking-wider"></span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Push to Talk -->
+                <div class="flex justify-center w-full mt-10 mb-8">
+                    <button id="ptt-btn" class="ptt-button bg-surface rounded-full w-28 h-28 flex flex-col items-center justify-center text-primary border-4 border-dotted border-primary relative group tap-target-active shadow-md transition-all hover:bg-primary-fixed hover:scale-105" aria-label="Push to talk">
+                        <span class="material-symbols-outlined text-[36px] group-hover:scale-110 transition-transform text-primary">mic</span>
+                        <span class="font-label-caps text-[11px] font-bold tracking-widest uppercase mt-2 text-primary">Hold</span>
+                    </button>
+                </div>
+
+                <!-- Board Container -->
+                <section id="board-container" class="board-hidden w-full max-w-[480px] mx-auto mt-4 bg-surface-container-lowest rounded-xl gond-border flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-lg transition-all duration-500">
+                    <div id="chess-board" class="w-full aspect-square bg-surface-container rounded-lg overflow-hidden border-2 border-primary/20 shadow-inner"></div>
+                </section>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap justify-center gap-4 mt-auto pt-8 w-full">
+                    <button id="start-btn" class="control-btn bg-[#10b981] text-white rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active shadow-md hover:opacity-90 transition-all font-label-caps tracking-widest uppercase border-2 border-dashed border-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[20px]">play_arrow</span> Start
+                    </button>
+                    <button id="stop-btn" disabled class="control-btn bg-[#ef4444] text-white rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active shadow-md hover:opacity-90 transition-all font-label-caps tracking-widest uppercase border-2 border-dashed border-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[20px]">stop</span> Stop
+                    </button>
+                    <button id="show-board-btn" class="control-btn bg-surface text-primary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-all font-label-caps tracking-widest uppercase gond-border disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span> Show Board
+                    </button>
+                    <button id="new-game-btn" class="control-btn bg-surface text-tertiary rounded-full px-6 h-12 flex items-center justify-center gap-2 tap-target-active hover:bg-surface-container transition-all font-label-caps tracking-widest uppercase border-2 border-dotted border-tertiary disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[20px]">refresh</span> New Game
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Column: Move History -->
+            <aside class="w-full md:w-1/4 flex flex-col order-3 h-[400px] md:h-auto max-h-[600px]">
+                <div class="bg-surface rounded-xl gond-border flex flex-col h-full overflow-hidden shadow-sm">
+                    <div class="p-5 border-b border-dotted border-primary/50 flex justify-between items-center bg-surface-container-lowest">
+                        <h3 class="font-h2 text-[20px] text-primary font-bold">History</h3>
+                        <span class="material-symbols-outlined text-primary/70">history</span>
+                    </div>
+                    <div class="flex-1 overflow-hidden flex flex-col">
+                        <div class="flex text-primary/70 font-bold border-b border-dashed border-primary/20 py-3 px-4 bg-surface-container-low text-sm uppercase tracking-wider">
+                            <div class="w-8 text-right pr-2">#</div>
+                            <div class="flex-1 pl-2">White</div>
+                            <div class="flex-1 pl-2">Black</div>
+                        </div>
+                        <div id="move-history" class="move-history flex-1 overflow-y-auto p-4 space-y-1 font-mono-data text-sm custom-scrollbar">
+                            <!-- Moves populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="js/move-parser.js"></script>
+    <script src="js/chess-engine.js"></script>
+    <script src="js/voice.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+.DS_Store
+archive/
+node_modules/
+.env
+venv/
+__pycache__/
+*.pth
+*.npz
