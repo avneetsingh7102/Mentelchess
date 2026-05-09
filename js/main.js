@@ -74,12 +74,19 @@ const els = {
 // ---------------------------------------------------------------------------
 // Initialization
 // ---------------------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
     checkBackendHealth();
     setupDifficultySelection();
     setupVoiceToggles();
     setupAuth();
-});
+}
+
+// Robust init — handles cached pages where DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 function setupAuth() {
     if (!supabase) return; // Skip if Supabase is not configured
