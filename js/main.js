@@ -752,3 +752,21 @@ function updateLastSpoken(text) {
 window.updateRecognizedText = updateRecognizedText;
 window.updateLastSpoken = updateLastSpoken;
 window.moveParser = null; // Set after game init
+
+// --- VISIBILITY FIX FOR HTML BUTTONS ---
+window.initApp = initApp;
+window.startNewGame = startNewGame;
+window.selectDifficulty = function(level) {
+    if (typeof currentDifficulty !== 'undefined') {
+        currentDifficulty = level;
+        startNewGame();
+    } else {
+        // Fallback if main.js is still loading
+        console.log("Loading engine...");
+    }
+};
+// Make difficulty accessible
+Object.defineProperty(window, 'currentDifficulty', {
+    get: function() { return currentDifficulty; },
+    set: function(val) { currentDifficulty = val; }
+});
