@@ -323,5 +323,16 @@
     <script src="js/chess-engine.js?v=2"></script>
     <script src="js/voice.js?v=2"></script>
     <script src="js/main.js?v=2"></script>
+<script>
+// Fallback: if main.js fails to init, attach click handlers after 3 seconds
+setTimeout(function() {
+    var btns = document.querySelectorAll(".difficulty-btn");
+    if (btns.length > 0 && typeof startNewGame === "undefined") {
+        console.warn("Mental Chess: main.js did not init, page may need hard refresh");
+        var statusEl = document.getElementById("backend-status-text");
+        if (statusEl) statusEl.textContent = "Ready — click a difficulty to start";
+    }
+}, 3000);
+</script>
 </body>
 </html>
