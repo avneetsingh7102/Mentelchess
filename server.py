@@ -17,6 +17,17 @@ import os
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
+
+@app.after_request
+def add_no_cache_headers(response):
+    """Prevent browsers from caching JS/CSS/HTML files."""
+    if response.content_type and any(t in response.content_type for t in ['javascript', 'css', 'html']):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
+
+
 # In-memory game sessions: session_id → chess.Board
 sessions = {}
 
