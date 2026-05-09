@@ -79,6 +79,17 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container relative z-0">
+<script>
+function selectDifficulty(level) {
+  if (typeof currentDifficulty !== "undefined") {
+    currentDifficulty = level;
+    startNewGame();
+  } else {
+    console.log("Waiting for engine...");
+    alert("Neural engine is still warming up... please wait 2 seconds and try again!");
+  }
+}
+</script>
     <div class="fixed inset-0 gond-pattern-bg pointer-events-none z-[-1]"></div>
 
     <!-- Difficulty Selection Screen -->
@@ -119,7 +130,7 @@
             <!-- Difficulty Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
                 <!-- Beginner Card -->
-                <button id="diff-beginner" data-level="beginner" class="difficulty-btn difficulty-card beginner gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                <button id="diff-beginner" data-level="beginner" onclick="selectDifficulty('beginner')" class="difficulty-btn difficulty-card beginner gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#10b981] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
                     <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
                         <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#10b981] border border-dotted border-[#10b981]/50 shadow-sm">
@@ -131,7 +142,7 @@
                 </button>
 
                 <!-- Intermediate Card -->
-                <button id="diff-intermediate" data-level="intermediate" class="difficulty-btn difficulty-card intermediate gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                <button id="diff-intermediate" data-level="intermediate" onclick="selectDifficulty('intermediate')" class="difficulty-btn difficulty-card intermediate gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#3b82f6] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
                     <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
                         <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#3b82f6] border border-dotted border-[#3b82f6]/50 shadow-sm">
@@ -143,7 +154,7 @@
                 </button>
 
                 <!-- Advanced Card -->
-                <button id="diff-advanced" data-level="advanced" class="difficulty-btn difficulty-card advanced gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                <button id="diff-advanced" data-level="advanced" onclick="selectDifficulty('advanced')" class="difficulty-btn difficulty-card advanced gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#8b5cf6] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
                     <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
                         <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#8b5cf6] border border-dotted border-[#8b5cf6]/50 shadow-sm">
@@ -155,7 +166,7 @@
                 </button>
 
                 <!-- Master Card -->
-                <button id="diff-master" data-level="master" class="difficulty-btn difficulty-card master gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
+                <button id="diff-master" data-level="master" onclick="selectDifficulty('master')" class="difficulty-btn difficulty-card master gond-border rounded-2xl p-8 bg-surface-container-lowest/90 backdrop-blur-sm text-left flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-32 h-32 bg-[#dc2626] opacity-5 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
                     <div class="flex flex-col items-start mb-6 z-10 pointer-events-none">
                         <div class="icon-bg w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-[#dc2626] border border-dotted border-[#dc2626]/50 shadow-sm">
@@ -319,10 +330,10 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/move-parser.js?v=3"></script>
-    <script src="js/chess-engine.js?v=3"></script>
-    <script src="js/voice.js?v=3"></script>
-    <script src="js/main.js?v=3"></script>
+    <script src="js/move-parser.js?v=4"></script>
+    <script src="js/chess-engine.js?v=4"></script>
+    <script src="js/voice.js?v=4"></script>
+    <script src="js/main.js?v=4"></script>
 <script>
 // Fallback: if main.js fails to init, attach click handlers after 3 seconds
 setTimeout(function() {
