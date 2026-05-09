@@ -194,6 +194,25 @@ def get_move_description(board, san):
 # Routes
 # ---------------------------------------------------------------------------
 
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        'name': 'Mental Chess API',
+        'version': '1.0.0',
+        'status': 'running',
+        'endpoints': {
+            'GET /': 'This page',
+            'GET /health': 'Health check',
+            'POST /new_game': 'Start a new game',
+            'POST /move': 'Make a move and get AI response',
+            'POST /get-move': 'Get AI move for a FEN position',
+            'GET /state?session_id=X': 'Get current game state',
+            'POST /undo': 'Undo last move pair',
+            'GET /hint?session_id=X': 'Get AI hint',
+        }
+    })
+
+
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({
