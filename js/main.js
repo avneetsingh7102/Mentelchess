@@ -75,16 +75,32 @@ const els = {
 // Initialization
 // ---------------------------------------------------------------------------
 function initApp() {
-    checkBackendHealth();
-    setupDifficultySelection();
-    setupVoiceToggles();
-    setupAuth();
+    try {
+        checkBackendHealth();
+        setupDifficultySelection();
+        setupVoiceToggles();
+        setupAuth();
+        console.log("Mental Chess: initApp OK");
+    } catch(e) {
+        console.error("Mental Chess initApp error:", e);
+        document.querySelectorAll(".difficulty-btn").forEach(function(btn) {
+            btn.onclick = function() {
+                currentDifficulty = btn.dataset.level;
+                startNewGame();
+            };
+        });
+    }
 }
 
-// Robust init — handles cached pages where DOMContentLoaded already fired
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+// Bulletproof init
+window.addEventListener("load", function() {
+    if (typeof initApp === "function") initApp();
+});
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
 } else {
+    try { initApp(); } catch(e) { console.error("initApp call failed:", e); }
+}
     initApp();
 }
 
