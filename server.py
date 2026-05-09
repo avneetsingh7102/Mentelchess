@@ -5,7 +5,7 @@ Lightweight Flask server for the Mental Chess trainer.
 Uses python-chess for move generation with difficulty-based AI.
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 import chess
 import chess.pgn
@@ -13,7 +13,8 @@ import random
 import uuid
 import os
 
-app = Flask(__name__)
+# Serve static files from the repo root
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 # In-memory game sessions: session_id → chess.Board
@@ -194,23 +195,10 @@ def get_move_description(board, san):
 # Routes
 # ---------------------------------------------------------------------------
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def home():
-    return jsonify({
-        'name': 'Mental Chess API',
-        'version': '1.0.0',
-        'status': 'running',
-        'endpoints': {
-            'GET /': 'This page',
-            'GET /health': 'Health check',
-            'POST /new_game': 'Start a new game',
-            'POST /move': 'Make a move and get AI response',
-            'POST /get-move': 'Get AI move for a FEN position',
-            'GET /state?session_id=X': 'Get current game state',
-            'POST /undo': 'Undo last move pair',
-            'GET /hint?session_id=X': 'Get AI hint',
-        }
-    })
+    """Serve the main chess game UI."""
+    return send_file('index.html')
 
 
 @app.route('/health', methods=['GET'])
