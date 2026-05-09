@@ -101,8 +101,6 @@ if (document.readyState === "loading") {
 } else {
     try { initApp(); } catch(e) { console.error("initApp call failed:", e); }
 }
-    initApp();
-}
 
 function setupAuth() {
     if (!supabase) return; // Skip if Supabase is not configured
