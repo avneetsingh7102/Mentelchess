@@ -5,15 +5,15 @@
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:8000'
     : '';
 
-let backendAvailable = false;
+var backendAvailable = false;
 
 // Supabase (disabled until credentials are provided)
-let supabase = null;
-let currentUser = null;
+var supabaseClient = null;
+var currentUser = null;
 
 // ---------------------------------------------------------------------------
 // Global State
@@ -30,7 +30,7 @@ var isVoiceMuted = false;
 // ---------------------------------------------------------------------------
 // DOM Helpers
 // ---------------------------------------------------------------------------
-const els = {
+var els = {
     diffScreen:       () => document.getElementById('difficulty-screen'),
     gameScreen:       () => document.getElementById('game-screen'),
     currentDifficulty:() => document.getElementById('current-difficulty'),
