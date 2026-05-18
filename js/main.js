@@ -288,7 +288,7 @@ async function handleMoveViaBackend(moveStr) {
         });
         if (!res.ok) {
             const err = await res.json();
-            voice.speak(err.detail || 'That move is illegal. Try again.');
+            voice.speak(err.error || 'That move is illegal. Try again.');
             addMoveToHistory(moveStr, 'invalid');
             return;
         }
@@ -298,14 +298,14 @@ async function handleMoveViaBackend(moveStr) {
         voice.speak('You played ' + data.player_move_san);
         updateBoard();
 
-        if (data.game_over) { handleGameOver(data.result_text); return; }
+        if (data.game_over) { handleGameOver(data.game_result); return; }
 
         if (data.ai_move_san) {
             addMoveToHistory(data.ai_move_san, 'valid', true);
-            showAIFeedback(data.ai_message || ('AI played ' + data.ai_move_san), data.ai_confidence);
-            voice.speak('AI plays ' + data.ai_move_san + (data.ai_message ? '. ' + data.ai_message : ''));
+            showAIFeedback(data.ai_move_description || ('AI played ' + data.ai_move_san), null);
+            voice.speak('AI plays ' + data.ai_move_san + (data.ai_move_description ? '. ' + data.ai_move_description : ''));
             updateBoard();
-            if (data.game_over_after_ai) handleGameOver(data.result_text_after_ai);
+            if (data.game_over) handleGameOver(data.game_result);
         }
     } catch (e) {
         console.error('Backend move error:', e);
@@ -343,24 +343,61 @@ function handleMoveLocally(moveStr) {
 // Command & Query Handling
 // ---------------------------------------------------------------------------
 async function handleCommand(command) {
-    if (command === 'new game') {
+    if (command === 'new game' || command === 'new_game') {
         var diffScreen = els.diffScreen();
         var gameScreen = els.gameScreen();
         if (gameScreen) gameScreen.classList.remove('active');
         if (diffScreen) diffScreen.classList.add('active');
         if (voice) voice.stopListening();
-    } else if (command === 'show board') {
+    } else if (command === 'show board' || command === 'show_board') {
         showBoard();
-    } else if (command === 'hide board') {
+    } else if (command === 'hide board' || command === 'hide_board') {
         hideBoard();
     } else if (command === 'resign') {
         voice.speak('You resigned. Game over.');
         handleGameOver('You resigned.');
+    } else if (command === 'undo') {
+        if (backendAvailable && sessionId) {
+            try {
+                var res = await fetch(API_BASE + '/undo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+                var data = await res.json();
+                if (data.fen) {
+                    game.load(data.fen);
+                    moveHistory.splice(-2);
+                    updateMoveHistory();
+                    updateBoard();
+                    voice.speak(data.message || 'Move undone.');
+                } else {
+                    voice.speak(data.error || 'Cannot undo.');
+                }
+            } catch (e) {
+                handleUndoLocally();
+            }
+        } else {
+            handleUndoLocally();
+        }
     }
 }
 
+function handleUndoLocally() {
+    if (game.history().length < 2) {
+        voice.speak('No moves to undo.');
+        return;
+    }
+    game.undo();
+    game.undo();
+    moveHistory.splice(-2);
+    updateMoveHistory();
+    updateBoard();
+    voice.speak('Move undone. Your turn.');
+}
+
 async function handleQuery(query) {
-    if (query === 'board' || query === 'position') {
+    if (query === 'board' || query === 'position' || query === 'read_board') {
         if (backendAvailable && sessionId) {
             try {
                 const res = await fetch(API_BASE + '/board?session_id=' + sessionId);
